@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#f7f5ef">
+  <meta name="description" content="План дня, свободное время и программа тренировки.">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Сегодня">
+  <link rel="icon" type="image/svg+xml" href="assets/icon.svg">
+  <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="stylesheet" href="css/style.css">
+  <title>Сегодня</title>
+</head>
+<body>
+  <main class="planner" id="app">
+    <div class="topbar"><a class="brand" href="#today">сегодня<span class="brand-dot">.</span></a><button class="quiet-button" id="refresh" type="button">Обновить</button></div>
+    <section id="day-view" aria-labelledby="date-title">
+      <header class="day-header"><p class="eyebrow" id="weekday"></p><h1 id="date-title">Сегодня</h1><p class="summary" id="summary">Загружаем план дня…</p></header>
+      <div class="notices" id="notices" aria-live="polite"></div>
+      <div id="day-map" class="day-map" aria-label="Распределение дня"></div>
+      <div id="timeline" class="timeline"></div>
+    </section>
+    <section id="workout-view" hidden aria-labelledby="workout-title" tabindex="-1">
+      <a class="back-link" href="#today">Вернуться к дню</a>
+      <header class="workout-header"><p class="eyebrow">Тренировка</p><h1 id="workout-title">Программа</h1><p class="summary" id="workout-duration"></p></header>
+      <div id="workout-content"></div>
+    </section>
+    <p class="storage-note" id="storage-note" hidden>На этом устройстве отметки сохраняются только до закрытия страницы.</p>
+    <noscript><p class="notice">Для показа плана включи JavaScript в настройках браузера.</p></noscript>
+  </main>
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>

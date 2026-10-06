@@ -1,0 +1,44 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "config",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "timezone",
+    "day_start",
+    "day_end",
+    "morning_end",
+    "evening_start",
+    "min_free_minutes"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": 1
+    },
+    "timezone": {
+      "const": "Europe/Moscow"
+    },
+    "day_start": {
+      "type": "string",
+      "pattern": "^(?:[01]\\d|2[0-3]):[0-5]\\d$"
+    },
+    "day_end": {
+      "type": "string",
+      "pattern": "^(?:[01]\\d|2[0-3]):[0-5]\\d$"
+    },
+    "morning_end": {
+      "type": "string",
+      "pattern": "^(?:[01]\\d|2[0-3]):[0-5]\\d$"
+    },
+    "evening_start": {
+      "type": "string",
+      "pattern": "^(?:[01]\\d|2[0-3]):[0-5]\\d$"
+    },
+    "min_free_minutes": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 120
+    }
+  }
+}

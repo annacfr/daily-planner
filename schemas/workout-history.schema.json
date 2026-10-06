@@ -1,0 +1,143 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "workout-history",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "sessions"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": 1
+    },
+    "sessions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "workout_id",
+          "date",
+          "duration_minutes",
+          "status",
+          "exercises"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 64,
+            "pattern": "^[a-z0-9][a-z0-9_-]*$"
+          },
+          "workout_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 64,
+            "pattern": "^[a-z0-9][a-z0-9_-]*$"
+          },
+          "date": {
+            "type": "string",
+            "format": "date",
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+          },
+          "duration_minutes": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 180
+          },
+          "status": {
+            "enum": [
+              "completed",
+              "partial"
+            ]
+          },
+          "exercises": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "name",
+                "muscle_groups"
+              ],
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 100,
+                  "pattern": "\\S"
+                },
+                "sets": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 20
+                },
+                "reps": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 40,
+                  "pattern": "\\S"
+                },
+                "duration_minutes": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 180
+                },
+                "rest_sec": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 600
+                },
+                "note": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 240,
+                  "pattern": "\\S"
+                },
+                "muscle_groups": {
+                  "type": "array",
+                  "items": {
+                    "enum": [
+                      "quadriceps",
+                      "hamstrings",
+                      "glutes",
+                      "back",
+                      "chest",
+                      "arms",
+                      "core",
+                      "cardio",
+                      "mobility",
+                      "full_body"
+                    ]
+                  },
+                  "minItems": 1,
+                  "maxItems": 10,
+                  "uniqueItems": true
+                }
+              },
+              "anyOf": [
+                {
+                  "required": [
+                    "sets",
+                    "reps"
+                  ]
+                },
+                {
+                  "required": [
+                    "duration_minutes"
+                  ]
+                }
+              ]
+            },
+            "minItems": 1,
+            "maxItems": 70
+          }
+        }
+      },
+      "minItems": 0,
+      "maxItems": 10000
+    }
+  }
+}
