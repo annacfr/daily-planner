@@ -20,7 +20,7 @@ export function normalizeToday(raw){
     events.push({id:event.id,start:event.start,end:event.end,title:event.title,type:event.type,...(hasText(event.description)?{description:event.description}:{}),...(hasText(event.workout_id)?{workout_id:event.workout_id}:{})});
   }
   events.sort((a,b)=>minutes(a.start)-minutes(b.start)||minutes(a.end)-minutes(b.end));
-  return {date:raw.date,summary:hasText(raw.summary)?raw.summary:'План дня',is_example:raw.is_example===true,schedule:events,skipped};
+  return {date:raw.date,summary:hasText(raw.summary)?raw.summary:'План дня',is_example:raw.is_example===true,school_mode:raw.school_mode==='none'?'none':'auto',schedule:events,skipped};
 }
 export function normalizeConfig(raw){
   const c={...DEFAULT_CONFIG};if(!raw || raw.schema_version!==1) return c;
@@ -69,6 +69,11 @@ export function normalizeSchoolSchedule(raw){
 export function moscowWeekday(now=new Date()){
   const label=new Intl.DateTimeFormat('en-US',{timeZone:'Europe/Moscow',weekday:'long'}).format(now).toLowerCase();
   return SCHOOL_DAYS.includes(label)?label:'monday';
+}
+export function schoolWeekdayForDate(date){
+  if(!isDate(date))return null;
+  const label=new Intl.DateTimeFormat('en-US',{timeZone:'Europe/Moscow',weekday:'long'}).format(new Date(`${date}T12:00:00Z`)).toLowerCase();
+  return SCHOOL_DAYS.includes(label)?label:null;
 }
 export function moscowMinutes(now=new Date()){
   const parts=new Intl.DateTimeFormat('en-GB',{timeZone:'Europe/Moscow',hour:'2-digit',minute:'2-digit',hourCycle:'h23'}).formatToParts(now);

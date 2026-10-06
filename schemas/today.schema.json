@@ -26,6 +26,9 @@
     "is_example": {
       "type": "boolean"
     },
+    "school_mode": {
+      "enum": ["auto", "none"]
+    },
     "schedule": {
       "type": "array",
       "items": {

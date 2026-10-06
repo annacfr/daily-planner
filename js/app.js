@@ -1,4 +1,4 @@
-import {normalizeToday,normalizeConfig,normalizeSchoolSchedule,moscowWeekday,moscowMinutes,workoutMatches,freeWindows,minutes,clock,localDate,hasText,DEFAULT_CONFIG,SCHOOL_DAYS} from './model.js';
+import {normalizeToday,normalizeConfig,normalizeSchoolSchedule,moscowWeekday,moscowMinutes,schoolWeekdayForDate,workoutMatches,freeWindows,minutes,clock,localDate,hasText,DEFAULT_CONFIG,SCHOOL_DAYS} from './model.js';
 const $=id=>document.getElementById(id);
 let day=null,workout=null,schoolSchedule=null,config=DEFAULT_CONFIG,completed=new Set(),storageOK=true,loading=false,dayScroll=0,workoutVisible=false,completedDate=null,selectedSchoolDay=moscowWeekday();
 const DAY_LABELS={monday:['ПН','Понедельник'],tuesday:['ВТ','Вторник'],wednesday:['СР','Среда'],thursday:['ЧТ','Четверг'],friday:['ПТ','Пятница']};
@@ -12,15 +12,21 @@ async function json(path,nonce,optional=false){
   try{const r=await fetch(`${path}?v=${nonce}`,{cache:'no-store',signal:controller.signal});if(!r.ok)throw new Error('load');const t=await r.text();if(optional && !t.trim())return null;return JSON.parse(t);}finally{clearTimeout(timer);}
 }
 function periods(){return [{name:'Утро',start:minutes(config.day_start),end:minutes(config.morning_end)},{name:'День',start:minutes(config.morning_end),end:minutes(config.evening_start)},{name:'Вечер',start:minutes(config.evening_start),end:minutes(config.day_end)}];}
+function daySchedule(){
+  if(day.school_mode==='none'||!schoolSchedule||day.schedule.some(event=>event.type==='school'))return day.schedule;
+  const weekday=schoolWeekdayForDate(day.date),lessons=weekday?schoolSchedule.weekdays[weekday]:null;
+  if(!lessons?.length)return day.schedule;
+  const school={id:`school-${day.date}`,start:lessons[0].start,end:lessons.at(-1).end,title:'Школа',type:'school',automaticSchool:true};
+  return [school,...day.schedule].sort((a,b)=>minutes(a.start)-minutes(b.start));
+}
 function eventNode(event){
   const row=el('article',`event${event.type==='workout'?' workout':''}${completed.has(event.id)?' done':''}`);
   row.dataset.eventId=event.id;
   const t=el('div','time',event.start);t.append(el('span','',event.end));row.append(t);
   const body=el('div','event-body');body.style.setProperty('--event-height',`${Math.min(116,76+(minutes(event.end)-minutes(event.start))*.16)}px`);
-  const top=el('div','event-top'),h=el('h3','',event.title),label=el('label','complete'),input=el('input');
-  input.type='checkbox';input.checked=completed.has(event.id);input.setAttribute('aria-label',`Выполнено: ${event.title}`);label.title='Отметить выполненным или снять отметку';
-  input.addEventListener('change',()=>{if(input.checked)completed.add(event.id);else completed.delete(event.id);row.classList.toggle('done',input.checked);saveCompleted();});
-  label.append(input);top.append(h,label);body.append(top);
+  const top=el('div','event-top'),h=el('h3','',event.title);top.append(h);
+  if(!event.automaticSchool){const label=el('label','complete'),input=el('input');input.type='checkbox';input.checked=completed.has(event.id);input.setAttribute('aria-label',`Выполнено: ${event.title}`);label.title='Отметить выполненным или снять отметку';input.addEventListener('change',()=>{if(input.checked)completed.add(event.id);else completed.delete(event.id);row.classList.toggle('done',input.checked);saveCompleted();});label.append(input);top.append(label);}
+  body.append(top);
   if(event.description)body.append(el('p','event-description',event.description));
   if(event.type==='workout'){
     body.append(el('p','duration',`≈ ${workoutMatches(workout,event,day.date)?workout.duration_minutes:minutes(event.end)-minutes(event.start)} мин`));
@@ -30,6 +36,7 @@ function eventNode(event){
 }
 function freeNode(window){const row=el('div','free-slot'),t=el('div','time',clock(window.start));t.append(el('span','',clock(window.end)));row.append(t,el('p','', 'Свободно'));return row;}
 function renderDay(){
+  const schedule=daySchedule();
   const d=new Date(`${day.date}T12:00:00Z`);
   $('weekday').textContent=new Intl.DateTimeFormat('ru',{weekday:'long',timeZone:'Europe/Moscow'}).format(d);
   $('date-title').textContent=new Intl.DateTimeFormat('ru',{day:'numeric',month:'long',timeZone:'Europe/Moscow'}).format(d);
@@ -38,24 +45,24 @@ function renderDay(){
   if(day.is_example)notice('Пример расписания. Замени его своим планом перед использованием.');
   if(day.date!==localDate())notice(`План на ${new Intl.DateTimeFormat('ru',{day:'numeric',month:'long',year:'numeric',timeZone:'Europe/Moscow'}).format(d)}. На сегодня план ещё не обновлён.`);
   if(day.skipped)notice('Часть событий не удалось показать. Остальной план доступен.');
-  const overlap=day.schedule.some((e,i)=>day.schedule.slice(0,i).some(p=>minutes(p.end)>minutes(e.start)));
+  const overlap=schedule.some((e,i)=>schedule.slice(0,i).some(p=>minutes(p.end)>minutes(e.start)));
   if(overlap)notice('Некоторые дела пересекаются по времени. Проверь расписание.');
-  const ps=periods(),begin=Math.min(ps[0].start,...day.schedule.map(e=>minutes(e.start))),end=Math.max(ps[2].end,...day.schedule.map(e=>minutes(e.end))),span=end-begin;
+  const ps=periods(),begin=Math.min(ps[0].start,...schedule.map(e=>minutes(e.start))),end=Math.max(ps[2].end,...schedule.map(e=>minutes(e.end))),span=end-begin;
   const track=el('div','map-track');track.setAttribute('aria-hidden','true');
-  for(const e of day.schedule){const n=el('span',`map-busy${e.type==='workout'?' workout':''}`);n.style.left=`${(minutes(e.start)-begin)/span*100}%`;n.style.width=`${(minutes(e.end)-minutes(e.start))/span*100}%`;track.append(n);}
+  for(const e of schedule){const n=el('span',`map-busy${e.type==='workout'?' workout':''}`);n.style.left=`${(minutes(e.start)-begin)/span*100}%`;n.style.width=`${(minutes(e.end)-minutes(e.start))/span*100}%`;track.append(n);}
   const labels=el('div','map-labels');labels.append(el('span','',clock(begin)),el('span','','12:00'),el('span','','18:00'),el('span','',clock(end)));$('day-map').replaceChildren(track,labels);
   const timeline=$('timeline');timeline.replaceChildren();
-  if(!day.schedule.length){timeline.append(el('p','empty-day','На этот день дел пока нет.'));return;}
+  if(!schedule.length){timeline.append(el('p','empty-day','На этот день дел пока нет.'));return;}
   ps[0].start=begin;ps[2].end=end;
-  const windows=freeWindows(day.schedule,begin,end,config.min_free_minutes);
+  const windows=freeWindows(schedule,begin,end,config.min_free_minutes);
   for(const p of ps){
     const section=el('section','period'),heading=el('div','period-heading'),items=el('div','timeline-items');
     heading.append(el('h2','',p.name),el('span','',`${clock(p.start)}–${clock(p.end)}`));
-    const entries=day.schedule.filter(e=>minutes(e.start)>=p.start&&minutes(e.start)<p.end).map(e=>({start:minutes(e.start),event:e}));
+    const entries=schedule.filter(e=>minutes(e.start)>=p.start&&minutes(e.start)<p.end).map(e=>({start:minutes(e.start),event:e}));
     for(const w of windows){const s=Math.max(w.start,p.start),t=Math.min(w.end,p.end);if(t-s>=config.min_free_minutes)entries.push({start:s,window:{start:s,end:t}});}
     entries.sort((a,b)=>a.start-b.start);
     for(const entry of entries)items.append(entry.event?eventNode(entry.event):freeNode(entry.window));
-    if(!entries.length){const busy=day.schedule.some(e=>minutes(e.start)<p.end&&minutes(e.end)>p.start);items.append(el('p','empty-day',busy?'Продолжается дело из предыдущей части дня.':'Запланированных дел нет.'));}
+    if(!entries.length){const busy=schedule.some(e=>minutes(e.start)<p.end&&minutes(e.end)>p.start);items.append(el('p','empty-day',busy?'Продолжается дело из предыдущей части дня.':'Запланированных дел нет.'));}
     section.append(heading,items);timeline.append(section);
   }
 }
