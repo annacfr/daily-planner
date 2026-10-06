@@ -1,4 +1,4 @@
-import {normalizeToday,normalizeConfig,normalizeSchoolSchedule,moscowWeekday,moscowMinutes,schoolWeekdayForDate,workoutMatches,freeWindows,minutes,clock,localDate,hasText,DEFAULT_CONFIG,SCHOOL_DAYS} from './model.js';
+import {normalizeToday,normalizeConfig,normalizeSchoolSchedule,moscowWeekday,moscowMinutes,schoolWeekdayForDate,workoutMatches,freeWindows,minutes,clock,localDate,hasText,DEFAULT_CONFIG,SCHOOL_DAYS} from './model.js?v=3';
 const $=id=>document.getElementById(id);
 let day=null,workout=null,schoolSchedule=null,config=DEFAULT_CONFIG,completed=new Set(),storageOK=true,loading=false,dayScroll=0,workoutVisible=false,completedDate=null,selectedSchoolDay=moscowWeekday();
 const DAY_LABELS={monday:['ПН','Понедельник'],tuesday:['ВТ','Вторник'],wednesday:['СР','Среда'],thursday:['ЧТ','Четверг'],friday:['ПТ','Пятница']};
