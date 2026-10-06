@@ -1,0 +1,61 @@
+{
+  "schema_version": 1,
+  "timezone": "Europe/Moscow",
+  "lesson_times": [
+    {"number": 1, "start": "08:00", "end": "08:40"},
+    {"number": 2, "start": "08:50", "end": "09:30"},
+    {"number": 3, "start": "09:45", "end": "10:25"},
+    {"number": 4, "start": "10:45", "end": "11:25"},
+    {"number": 5, "start": "11:40", "end": "12:20"},
+    {"number": 6, "start": "12:30", "end": "13:10"},
+    {"number": 7, "start": "13:20", "end": "14:00"},
+    {"number": 8, "start": "14:10", "end": "14:50"}
+  ],
+  "weekdays": {
+    "monday": [
+      {"number": 1, "subject": "Разговоры о важном"},
+      {"number": 2, "subject": "Иностранный язык"},
+      {"number": 3, "subject": "История"},
+      {"number": 4, "subject": "Физика"},
+      {"number": 5, "subject": "Обществознание"},
+      {"number": 6, "subject": "Геометрия"},
+      {"number": 7, "subject": "География"},
+      {"number": 8, "subject": "Русский язык"}
+    ],
+    "tuesday": [
+      {"number": 1, "subject": "Биология"},
+      {"number": 2, "subject": "Обществознание"},
+      {"number": 3, "subject": "Иностранный язык"},
+      {"number": 4, "subject": "Информатика"},
+      {"number": 5, "subject": "Геометрия"},
+      {"number": 6, "subject": "География"},
+      {"number": 7, "subject": "Литература"}
+    ],
+    "wednesday": [
+      {"number": 1, "subject": "Алгебра"},
+      {"number": 2, "subject": "Алгебра"},
+      {"number": 3, "subject": "Финансовая грамотность"},
+      {"number": 4, "subject": "Физическая культура"},
+      {"number": 5, "subject": "Обществознание"},
+      {"number": 6, "subject": "Иностранный язык"},
+      {"number": 7, "subject": "Литература"}
+    ],
+    "thursday": [
+      {"number": 1, "subject": "Химия"},
+      {"number": 2, "subject": "ОБЗР"},
+      {"number": 3, "subject": "Алгебра"},
+      {"number": 4, "subject": "Русский язык"},
+      {"number": 5, "subject": "Русский язык"},
+      {"number": 6, "subject": "Статистика"}
+    ],
+    "friday": [
+      {"number": 1, "subject": "Геометрия"},
+      {"number": 2, "subject": "Физическая культура"},
+      {"number": 3, "subject": "Обществознание"},
+      {"number": 4, "subject": "История"},
+      {"number": 5, "subject": "Алгебра"},
+      {"number": 6, "subject": "География"},
+      {"number": 7, "subject": "Физика"}
+    ]
+  }
+}

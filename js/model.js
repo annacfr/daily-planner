@@ -1,5 +1,6 @@
 export const TYPES = ['school','study','work','home','personal','workout'];
 export const GROUPS = ['quadriceps','hamstrings','glutes','back','chest','arms','core','cardio','mobility','full_body'];
+export const SCHOOL_DAYS = ['monday','tuesday','wednesday','thursday','friday'];
 export const DEFAULT_CONFIG = Object.freeze({schema_version:1,timezone:'Europe/Moscow',day_start:'07:00',day_end:'23:00',morning_end:'12:00',evening_start:'18:00',min_free_minutes:20});
 export const isDate = value => {
   if(typeof value !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(value)) return false;
@@ -40,4 +41,36 @@ export function freeWindows(events,start,end,minGap){
 export function localDate(now=new Date()){
   const parts=new Intl.DateTimeFormat('en-CA',{timeZone:'Europe/Moscow',year:'numeric',month:'2-digit',day:'2-digit'}).formatToParts(now);
   const get=k=>parts.find(p=>p.type===k).value;return `${get('year')}-${get('month')}-${get('day')}`;
+}
+export function normalizeSchoolSchedule(raw){
+  if(!raw || raw.schema_version!==1 || raw.timezone!=='Europe/Moscow' || !Array.isArray(raw.lesson_times) || !raw.weekdays || typeof raw.weekdays!=='object') throw new Error('invalid school schedule');
+  const times=new Map();
+  for(const slot of raw.lesson_times){
+    if(!slot || !Number.isInteger(slot.number) || slot.number<1 || slot.number>12 || times.has(slot.number) || !isTime(slot.start) || !isTime(slot.end) || minutes(slot.start)>=minutes(slot.end)) throw new Error('invalid lesson time');
+    times.set(slot.number,{number:slot.number,start:slot.start,end:slot.end});
+  }
+  const sortedTimes=[...times.values()].sort((a,b)=>a.number-b.number);
+  for(let i=0;i<sortedTimes.length;i++){
+    if(sortedTimes[i].number!==i+1 || (i>0 && minutes(sortedTimes[i-1].end)>minutes(sortedTimes[i].start))) throw new Error('invalid lesson time order');
+  }
+  const weekdays={};
+  for(const day of SCHOOL_DAYS){
+    if(!Array.isArray(raw.weekdays[day])) throw new Error('missing weekday');
+    const seen=new Set();
+    weekdays[day]=raw.weekdays[day].map(lesson=>{
+      if(!lesson || !Number.isInteger(lesson.number) || seen.has(lesson.number) || !times.has(lesson.number) || !hasText(lesson.subject)) throw new Error('invalid lesson');
+      seen.add(lesson.number);const slot=times.get(lesson.number);
+      return {number:lesson.number,subject:lesson.subject,start:slot.start,end:slot.end};
+    }).sort((a,b)=>a.number-b.number);
+    for(let i=0;i<weekdays[day].length;i++)if(weekdays[day][i].number!==i+1)throw new Error('lesson numbers must be sequential');
+  }
+  return {timezone:raw.timezone,weekdays};
+}
+export function moscowWeekday(now=new Date()){
+  const label=new Intl.DateTimeFormat('en-US',{timeZone:'Europe/Moscow',weekday:'long'}).format(now).toLowerCase();
+  return SCHOOL_DAYS.includes(label)?label:'monday';
+}
+export function moscowMinutes(now=new Date()){
+  const parts=new Intl.DateTimeFormat('en-GB',{timeZone:'Europe/Moscow',hour:'2-digit',minute:'2-digit',hourCycle:'h23'}).formatToParts(now);
+  const get=k=>Number(parts.find(p=>p.type===k).value);return get('hour')*60+get('minute');
 }

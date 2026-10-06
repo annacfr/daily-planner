@@ -36,9 +36,15 @@ function validate(value,schema,path){
     }
   }
 }
+function resolveLocalRefs(schema,rootSchema){
+  if(!schema||typeof schema!=='object')return schema;
+  if(schema.$ref?.startsWith('#/$defs/'))return resolveLocalRefs(rootSchema.$defs[schema.$ref.slice(8)],rootSchema);
+  if(Array.isArray(schema))return schema.map(item=>resolveLocalRefs(item,rootSchema));
+  return Object.fromEntries(Object.entries(schema).map(([key,value])=>[key,resolveLocalRefs(value,rootSchema)]));
+}
 const data={};
-for(const name of ['today','workout','workout-history','config']){
-  try{data[name]=JSON.parse(await readFile(resolve(root,`data/${name}.json`),'utf8'));const schema=JSON.parse(await readFile(resolve(root,`schemas/${name}.schema.json`),'utf8'));validate(data[name],schema,`data/${name}.json`);}catch{errors.push(`data/${name}.json: файл недоступен или JSON некорректен`);}
+for(const name of ['today','workout','workout-history','config','school-schedule']){
+  try{data[name]=JSON.parse(await readFile(resolve(root,`data/${name}.json`),'utf8'));const originalSchema=JSON.parse(await readFile(resolve(root,`schemas/${name}.schema.json`),'utf8'));validate(data[name],resolveLocalRefs(originalSchema,originalSchema),`data/${name}.json`);}catch{errors.push(`data/${name}.json: файл недоступен или JSON некорректен`);}
 }
 if(!errors.length){
   const t=data.today,w=data.workout,h=data['workout-history'],c=data.config;
@@ -62,5 +68,9 @@ if(!errors.length){
   for(const s of h.sessions){if(s.date<last)errors.push('history: сортируй sessions по дате от старых к новым');last=s.date;if(s.date>t.date)errors.push('history: запись не может быть позже даты плана');}
   for(const e of [...(w?[...w.warmup,...w.main,...w.cooldown]:[]),...h.sessions.flatMap(s=>s.exercises)])if(Object.hasOwn(e,'sets')!==Object.hasOwn(e,'reps'))errors.push('sets и reps указываются вместе');
   for(let i=0;i<t.schedule.length;i++)if(t.schedule.slice(0,i).some(e=>minutes(e.end)>minutes(t.schedule[i].start)))console.warn(`Предупреждение: пересечение времени у ${t.schedule[i].id}`);
+  const school=data['school-schedule'];
+  const slots=new Map();
+  school.lesson_times.forEach((slot,i)=>{if(slots.has(slot.number))errors.push('school-schedule.lesson_times: номера должны быть уникальны');slots.set(slot.number,slot);if(slot.number!==i+1)errors.push('school-schedule.lesson_times: номера должны идти по порядку');if(minutes(slot.start)>=minutes(slot.end))errors.push(`school-schedule.lesson_times[${i}]: end должен быть позже start`);if(i>0&&minutes(school.lesson_times[i-1].end)>minutes(slot.start))errors.push('school-schedule.lesson_times: интервалы не должны пересекаться');});
+  for(const [day,lessons] of Object.entries(school.weekdays)){const seen=new Set();lessons.forEach((lesson,i)=>{if(seen.has(lesson.number))errors.push(`school-schedule.${day}: повтор номера урока`);seen.add(lesson.number);if(lesson.number!==i+1)errors.push(`school-schedule.${day}: номера должны идти по порядку с 1`);if(!slots.has(lesson.number))errors.push(`school-schedule.${day}: нет времени для урока ${lesson.number}`);});}
 }
-if(errors.length){for(const error of errors)console.error(error);process.exitCode=1;}else console.log('OK: 4 JSON-файла, схемы и связи данных проверены.');
+if(errors.length){for(const error of errors)console.error(error);process.exitCode=1;}else console.log('OK: 5 JSON-файлов, схемы и связи данных проверены.');

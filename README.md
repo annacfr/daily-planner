@@ -1,6 +1,6 @@
 # Сегодня
 
-Мобильный план дня: временная шкала, свободные окна, локальные отметки и отдельное представление тренировки. Обычные HTML, CSS и JavaScript, без сервера и устанавливаемых зависимостей.
+Мобильный план дня с двумя разделами: «Сегодня» (временная шкала, свободные окна, локальные отметки и тренировка) и «Расписание» (постоянные школьные уроки). Обычные HTML, CSS и JavaScript, без сервера и устанавливаемых зависимостей.
 
 **Текущий комплект содержит пример на 6 октября 2026 года, а не подтверждённое личное расписание.** Программа тоже демонстрационная. История тренировок пустая. Перед реальным использованием ежедневный агент заменяет пример на согласованный план.
 
@@ -11,6 +11,8 @@
 - `data/today.json` — день и события;
 - `data/workout.json` — программа или `null`;
 - `data/workout-history.json` — подтверждённые результаты.
+
+`data/school-schedule.json` — постоянное расписание: ежедневный агент читает его, но изменяет только по отдельному прямому запросу пользователя.
 
 `data/config.json`, интерфейс и инфраструктура остаются постоянными. Машинные схемы находятся в `schemas/`. Валидатор проверяет JSON, неизвестные поля, диапазоны, существование даты и связи между файлами.
 
@@ -40,7 +42,7 @@ python3 -m http.server 8080
 4. Запустить `Validate and publish Today` или отправить следующий коммит в main.
 5. Дождаться успешного deployment и открыть URL, показанный в Settings → Pages. Проверить именно работающий сайт, а не только workflow.
 
-Workflow сначала валидирует данные и синтаксис JavaScript. Если они неверны, deployment не запускается. В артефакт входят только HTML, CSS, JS, иконки, manifest и `today/workout/config`. История и документация не публикуются в Pages-артефакте; в публичном исходном репозитории они всё равно видимы. Источники: [настройка публикации](https://docs.github.com/en/pages/getting-started-with-github-pages/configuring-a-publishing-source-for-your-github-pages-site), [пользовательский workflow](https://docs.github.com/en/pages/getting-started-with-github-pages/using-custom-workflows-with-github-pages).
+Workflow сначала валидирует данные и синтаксис JavaScript. Если они неверны, deployment не запускается. В артефакт входят только HTML, CSS, JS, иконки, manifest и `today/workout/config/school-schedule`. История и документация не публикуются в Pages-артефакте; в публичном исходном репозитории они всё равно видимы. Источники: [настройка публикации](https://docs.github.com/en/pages/getting-started-with-github-pages/configuring-a-publishing-source-for-your-github-pages-site), [пользовательский workflow](https://docs.github.com/en/pages/getting-started-with-github-pages/using-custom-workflows-with-github-pages).
 
 ## iPhone
 

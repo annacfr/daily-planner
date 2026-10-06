@@ -41,7 +41,7 @@ jobs:
           mkdir -p _site/data
           cp index.html manifest.webmanifest .nojekyll _site/
           cp -r css js assets _site/
-          cp data/today.json data/workout.json data/config.json _site/data/
+          cp data/today.json data/workout.json data/config.json data/school-schedule.json _site/data/
       - uses: actions/upload-pages-artifact@v3
         with:
           path: _site

@@ -17,11 +17,21 @@
 <body>
   <main class="planner" id="app">
     <div class="topbar"><a class="brand" href="#today">сегодня<span class="brand-dot">.</span></a><button class="quiet-button" id="refresh" type="button">Обновить</button></div>
+    <nav class="primary-nav" aria-label="Основные разделы">
+      <a class="primary-nav-link" href="#today" data-route="today">Сегодня</a>
+      <a class="primary-nav-link" href="#schedule" data-route="schedule">Расписание</a>
+    </nav>
     <section id="day-view" aria-labelledby="date-title">
       <header class="day-header"><p class="eyebrow" id="weekday"></p><h1 id="date-title">Сегодня</h1><p class="summary" id="summary">Загружаем план дня…</p></header>
       <div class="notices" id="notices" aria-live="polite"></div>
       <div id="day-map" class="day-map" aria-label="Распределение дня"></div>
       <div id="timeline" class="timeline"></div>
+    </section>
+    <section id="schedule-view" hidden aria-labelledby="schedule-title" tabindex="-1">
+      <header class="schedule-header"><p class="eyebrow">Школа</p><h1 id="schedule-title">Расписание</h1><p class="summary">Постоянное расписание уроков</p></header>
+      <div class="schedule-notice" id="schedule-notice" aria-live="polite"></div>
+      <div class="weekday-switcher" id="weekday-switcher" aria-label="День недели"></div>
+      <div id="school-lessons" class="school-lessons"></div>
     </section>
     <section id="workout-view" hidden aria-labelledby="workout-title" tabindex="-1">
       <a class="back-link" href="#today">Вернуться к дню</a>

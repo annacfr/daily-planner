@@ -1,6 +1,7 @@
-import {normalizeToday,normalizeConfig,workoutMatches,freeWindows,minutes,clock,localDate,hasText,DEFAULT_CONFIG} from './model.js';
+import {normalizeToday,normalizeConfig,normalizeSchoolSchedule,moscowWeekday,moscowMinutes,workoutMatches,freeWindows,minutes,clock,localDate,hasText,DEFAULT_CONFIG,SCHOOL_DAYS} from './model.js';
 const $=id=>document.getElementById(id);
-let day=null,workout=null,config=DEFAULT_CONFIG,completed=new Set(),storageOK=true,loading=false,dayScroll=0,workoutVisible=false,completedDate=null;
+let day=null,workout=null,schoolSchedule=null,config=DEFAULT_CONFIG,completed=new Set(),storageOK=true,loading=false,dayScroll=0,workoutVisible=false,completedDate=null,selectedSchoolDay=moscowWeekday();
+const DAY_LABELS={monday:['ПН','Понедельник'],tuesday:['ВТ','Вторник'],wednesday:['СР','Среда'],thursday:['ЧТ','Четверг'],friday:['ПТ','Пятница']};
 const el=(tag,cls,text)=>{const n=document.createElement(tag);if(cls)n.className=cls;if(text!==undefined)n.textContent=text;return n;};
 const storageKey=()=>`today-planner:v1:${location.pathname}:${day.date}`;
 function notice(message){$('notices').append(el('p','notice',message));}
@@ -76,21 +77,45 @@ function renderWorkout(){
     });content.append(section);
   }
 }
+function renderSchoolSchedule(){
+  const notice=$('schedule-notice'),switcher=$('weekday-switcher'),lessons=$('school-lessons');
+  notice.replaceChildren();switcher.replaceChildren();lessons.replaceChildren();
+  if(!schoolSchedule){notice.append(el('p','notice','Не удалось загрузить школьное расписание. План на сегодня продолжает работать.'));return;}
+  const currentDay=moscowWeekday(),nowMinutes=moscowMinutes();
+  for(const dayName of SCHOOL_DAYS){
+    const button=el('button','weekday-button',DAY_LABELS[dayName][0]);button.type='button';
+    button.dataset.day=dayName;button.setAttribute('aria-label',DAY_LABELS[dayName][1]);button.setAttribute('aria-pressed',String(dayName===selectedSchoolDay));
+    if(dayName===currentDay)button.classList.add('is-today');
+    button.addEventListener('click',()=>{selectedSchoolDay=dayName;renderSchoolSchedule();});switcher.append(button);
+  }
+  const heading=el('div','school-day-heading');heading.append(el('h2','',DAY_LABELS[selectedSchoolDay][1]),el('span','',`${schoolSchedule.weekdays[selectedSchoolDay].length} уроков`));lessons.append(heading);
+  for(const lesson of schoolSchedule.weekdays[selectedSchoolDay]){
+    const active=selectedSchoolDay===currentDay && nowMinutes>=minutes(lesson.start) && nowMinutes<minutes(lesson.end);
+    const row=el('article',`school-lesson${active?' is-current':''}`);row.dataset.lesson=String(lesson.number);
+    row.append(el('span','lesson-number',String(lesson.number)));
+    const body=el('div','lesson-body');body.append(el('p','lesson-time',`${lesson.start}–${lesson.end}`),el('h3','',lesson.subject));
+    if(active)body.append(el('span','current-lesson-label','Сейчас'));row.append(body);lessons.append(row);
+  }
+}
 function route(){
-  const show=location.hash==='#workout';
-  if(show&&!workoutVisible)dayScroll=window.scrollY;
-  $('day-view').hidden=show;$('workout-view').hidden=!show;
-  if(show){renderWorkout();document.title='Тренировка · Сегодня';if(!workoutVisible){window.scrollTo(0,0);$('workout-view').focus({preventScroll:true});}}
+  const routeName=location.hash==='#workout'?'workout':location.hash==='#schedule'?'schedule':'today';
+  const showWorkout=routeName==='workout',showSchedule=routeName==='schedule';
+  if(showWorkout&&!workoutVisible)dayScroll=window.scrollY;
+  $('day-view').hidden=routeName!=='today';$('workout-view').hidden=!showWorkout;$('schedule-view').hidden=!showSchedule;
+  document.querySelectorAll('[data-route]').forEach(link=>{const active=link.dataset.route===routeName;link.classList.toggle('is-active',active);if(active)link.setAttribute('aria-current','page');else link.removeAttribute('aria-current');});
+  if(showWorkout){renderWorkout();document.title='Тренировка · Сегодня';if(!workoutVisible){window.scrollTo(0,0);$('workout-view').focus({preventScroll:true});}}
+  else if(showSchedule){renderSchoolSchedule();document.title='Расписание · Сегодня';if(workoutVisible||window.scrollY>0)window.scrollTo(0,0);}
   else{document.title='Сегодня';if(workoutVisible)window.scrollTo(0,dayScroll);}
-  workoutVisible=show;
+  workoutVisible=showWorkout;
 }
 async function load(){
   if(loading)return;loading=true;$('refresh').disabled=true;
   try{
     const nonce=Date.now();
-    const results=await Promise.allSettled([json('data/today.json',nonce),json('data/config.json',nonce),json('data/workout.json',nonce,true)]);
+    const results=await Promise.allSettled([json('data/today.json',nonce),json('data/config.json',nonce),json('data/workout.json',nonce,true),json('data/school-schedule.json',nonce)]);
     if(results[0].status!=='fulfilled')throw new Error('day unavailable');
     const next=normalizeToday(results[0].value);day=next;config=normalizeConfig(results[1].status==='fulfilled'?results[1].value:null);workout=results[2].status==='fulfilled'?results[2].value:null;
+    try{schoolSchedule=results[3].status==='fulfilled'?normalizeSchoolSchedule(results[3].value):null;}catch{schoolSchedule=null;}
     readCompleted();renderDay();route();
     if(results[1].status!=='fulfilled')notice('План показан с обычными границами дня.');
   }catch{
