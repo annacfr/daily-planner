@@ -1,10 +1,10 @@
 {
   "schema_version": 1,
-  "date": "2026-10-06",
-  "summary": "3 дела · вечер свободен",
+  "date": "2026-10-07",
+  "summary": "3 дела после школы",
   "schedule": [
-    {"id":"dom-dela","start":"14:10","end":"15:10","title":"Дом-дела","type":"work"},
-    {"id":"russian","start":"15:30","end":"17:00","title":"Русский","type":"study"},
-    {"id":"shors-project","start":"18:00","end":"19:00","title":"Проект ШОРС","type":"work"}
+    {"id":"informatics","start":"15:15","end":"16:00","title":"Информатика","type":"study"},
+    {"id":"shors-meeting","start":"16:30","end":"18:00","title":"Собрание ШОРС","type":"personal"},
+    {"id":"math","start":"18:20","end":"19:30","title":"Математика","type":"study"}
   ]
 }
