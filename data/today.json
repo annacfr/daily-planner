@@ -1,28 +1,21 @@
 {
   "schema_version": 1,
-  "date": "2026-10-08",
-  "summary": "Справка, русский и проект ШОРС",
+  "date": "2026-10-09",
+  "summary": "Школа, оформление справки и математика",
   "schedule": [
     {
       "id": "certificate",
-      "start": "13:10",
-      "end": "13:40",
+      "start": "14:10",
+      "end": "14:40",
       "title": "Оформить справку",
       "type": "personal"
     },
     {
-      "id": "russian",
-      "start": "15:30",
-      "end": "17:00",
-      "title": "Русский",
+      "id": "math-theory",
+      "start": "19:00",
+      "end": "22:20",
+      "title": "Математика — теория",
       "type": "study"
-    },
-    {
-      "id": "shors-project",
-      "start": "17:30",
-      "end": "18:30",
-      "title": "Проект ШОРС",
-      "type": "work"
     }
   ]
 }
