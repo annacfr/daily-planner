@@ -1,20 +1,64 @@
 {
   "schema_version": 1,
-  "date": "2026-10-09",
-  "summary": "Школа, оформление справки и математика",
+  "date": "2026-10-15",
+  "summary": "Учёба, русский и тренировка",
+  "school_mode": "none",
   "schedule": [
     {
-      "id": "certificate",
-      "start": "14:10",
-      "end": "14:40",
-      "title": "Оформить справку",
-      "type": "personal"
+      "id": "finish-math-homework",
+      "start": "11:20",
+      "end": "11:30",
+      "title": "Доделать примеры по математике",
+      "type": "study"
     },
     {
-      "id": "math-theory",
-      "start": "19:00",
-      "end": "22:20",
-      "title": "Математика — теория",
+      "id": "website",
+      "start": "11:30",
+      "end": "12:10",
+      "title": "Разобраться с сайтом",
+      "type": "work"
+    },
+    {
+      "id": "informatics-backlog",
+      "start": "12:35",
+      "end": "14:05",
+      "title": "Долги · информатика",
+      "type": "study"
+    },
+    {
+      "id": "russian-homework",
+      "start": "14:05",
+      "end": "14:35",
+      "title": "Домашнее задание по русскому",
+      "type": "study"
+    },
+    {
+      "id": "russian",
+      "start": "15:30",
+      "end": "17:00",
+      "title": "Русский",
+      "type": "study"
+    },
+    {
+      "id": "workout",
+      "start": "17:20",
+      "end": "19:20",
+      "title": "Тренировка",
+      "type": "workout",
+      "workout_id": "2026-10-15-full-body"
+    },
+    {
+      "id": "math-backlog",
+      "start": "19:50",
+      "end": "21:20",
+      "title": "Долги · математика",
+      "type": "study"
+    },
+    {
+      "id": "essay",
+      "start": "21:20",
+      "end": "21:40",
+      "title": "Написать сочинение",
       "type": "study"
     }
   ]

@@ -1,1 +1,76 @@
-null
+{
+  "schema_version": 1,
+  "id": "2026-10-15-full-body",
+  "date": "2026-10-15",
+  "title": "Тренировка · всё тело",
+  "duration_minutes": 65,
+  "warmup": [
+    {
+      "name": "Эллиптический тренажёр",
+      "duration_minutes": 5,
+      "muscle_groups": [
+        "cardio"
+      ]
+    },
+    {
+      "name": "Гиперэкстензия",
+      "sets": 2,
+      "reps": "10, затем 15",
+      "rest_sec": 60,
+      "muscle_groups": [
+        "back",
+        "core"
+      ]
+    }
+  ],
+  "main": [
+    {
+      "name": "Жим ногами",
+      "sets": 3,
+      "reps": "10–12",
+      "rest_sec": 90,
+      "muscle_groups": [
+        "quadriceps",
+        "glutes"
+      ]
+    },
+    {
+      "name": "Тяга верхнего блока",
+      "sets": 3,
+      "reps": "10–12",
+      "rest_sec": 90,
+      "muscle_groups": [
+        "back",
+        "arms"
+      ]
+    },
+    {
+      "name": "Румынская тяга",
+      "sets": 3,
+      "reps": "8–10",
+      "rest_sec": 90,
+      "muscle_groups": [
+        "hamstrings",
+        "glutes"
+      ]
+    },
+    {
+      "name": "Сведение рук в тренажёре",
+      "sets": 2,
+      "reps": "10–12",
+      "rest_sec": 75,
+      "muscle_groups": [
+        "chest"
+      ]
+    }
+  ],
+  "cooldown": [
+    {
+      "name": "Спокойная ходьба",
+      "duration_minutes": 5,
+      "muscle_groups": [
+        "cardio"
+      ]
+    }
+  ]
+}
